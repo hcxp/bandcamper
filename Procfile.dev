@@ -1,0 +1,2 @@
+app: bundle exec hanami s
+sidekiq: bundle exec sidekiq -e development -r ./config/boot.rb -q bandcamp

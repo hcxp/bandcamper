@@ -1,0 +1,3 @@
+project=bandcamp_api
+test=rspec
+template=erb
