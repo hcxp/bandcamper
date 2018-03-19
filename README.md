@@ -1,13 +1,13 @@
-# Bandcamp Api
+# Bandcamp API
 
-Welcome to your new Hanami project!
+Unofficial Bandcamp API server
 
 ## Setup
 
 How to run tests:
 
 ```
-% bundle exec rake
+% bundle exec rspec
 ```
 
 How to run the development console:
