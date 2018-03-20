@@ -1,9 +1,11 @@
 # Bandcamp API ![](https://travis-ci.org/hcxp/bandcamp-api.svg?branch=master)
 
-As of today, [Bandcamp](https://bandcamp.com) does not provides an API for
+As of today, [Bandcamp](https://bandcamp.com) does not provide an API for
 retrieving info about bands and their music in a developer friendly way. Aim of
 this project is to provide a self-hosted service that crawls given bands
 profiles and exposes found data using json:api format.
+
+Originally made for [hcxp.co](https://hcxp.co)
 
 ## Setup
 
