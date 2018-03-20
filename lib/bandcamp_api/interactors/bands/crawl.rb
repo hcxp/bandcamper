@@ -15,7 +15,7 @@ class Bands::Crawl
 
   expose :band, :name, :description, :location, :photo_url
 
-  def initialize(band, logger: Hanami::Logger.new)
+  def initialize(band, logger: Hanami.logger)
     @band = band
     @logger = logger
   end

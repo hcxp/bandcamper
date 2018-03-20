@@ -47,4 +47,8 @@ Hanami.configure do
       delivery :smtp, address: ENV['SMTP_HOST'], port: ENV['SMTP_PORT']
     end
   end
+
+  environment :test do
+    logger level: :warn
+  end
 end
