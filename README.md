@@ -1,4 +1,4 @@
-# Bandcamp API
+# Bandcamp API ![](https://travis-ci.org/hcxp/bandcamp-api.svg?branch=master)
 
 Unofficial Bandcamp API server
 

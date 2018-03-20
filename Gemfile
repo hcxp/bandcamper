@@ -27,6 +27,7 @@ group :test do
   gem 'capybara'
   gem 'webmock'
   gem 'hanami-fabrication'
+  gem 'simplecov', require: false
 end
 
 group :production do

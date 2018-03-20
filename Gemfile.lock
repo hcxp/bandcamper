@@ -24,6 +24,7 @@ GEM
     crack (0.4.3)
       safe_yaml (~> 1.0.0)
     diff-lcs (1.3)
+    docile (1.3.0)
     dotenv (2.2.1)
     dry-configurable (0.7.0)
       concurrent-ruby (~> 1.0)
@@ -117,6 +118,7 @@ GEM
       url_mount (~> 0.2.1)
     ice_nine (0.11.2)
     inflecto (0.0.2)
+    json (2.1.0)
     jsonapi-deserializable (0.2.0)
     jsonapi-rb (0.1.2)
       jsonapi-deserializable (~> 0.1)
@@ -186,6 +188,11 @@ GEM
     sidekiq-throttled (0.8.2)
       redis-prescription
       sidekiq
+    simplecov (0.16.1)
+      docile (~> 1.1)
+      json (>= 1.8, < 3)
+      simplecov-html (~> 0.10.0)
+    simplecov-html (0.10.2)
     spidr (0.6.0)
       nokogiri (~> 1.3)
     sqlite3 (1.3.13)
@@ -215,6 +222,7 @@ DEPENDENCIES
   shotgun
   sidekiq
   sidekiq-throttled
+  simplecov
   spidr
   sqlite3
   webmock

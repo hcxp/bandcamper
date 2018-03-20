@@ -4,8 +4,9 @@ before_script:
   - psql -c 'create database bandcamp_api_test;' -U postgres
 dist: trusty
 language: ruby
+cache: bundler
 rvm:
   - 2.5.0
 script:
-  - RAILS_ENV=test bundle exec hanami db prepare
+  - HANAMI_ENV=test bundle exec hanami db prepare
   - bundle exec rspec
