@@ -11,8 +11,8 @@ class Bands::FindOrCreateByUrls
   #   required(:urls) { filled? & array? }
   # end
 
-  def initialize(urls: [], logger: Hanami.logger)
-    @urls = urls
+  def initialize(urls: [], logger: Hanami::Logger.new)
+    @urls = urls || []
     @logger = logger
   end
 
