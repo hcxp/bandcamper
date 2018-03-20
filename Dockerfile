@@ -20,7 +20,6 @@ RUN bundle install --jobs 20 --retry 5 --without development test --path vendor/
 
 ENV HANAMI_HOST=0.0.0.0
 ENV HANAMI_ENV=production
-ENV DATABASE_URL=sqlite://app/db/bandcamp_api_production.sqlite3
 
 COPY . /app
 
