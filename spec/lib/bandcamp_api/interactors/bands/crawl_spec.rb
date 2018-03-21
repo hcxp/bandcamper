@@ -5,7 +5,7 @@ RSpec.describe Bands::Crawl, type: :interactor do
   end
 
   let(:interactor) { described_class.new(band, logger: Logger.new(nil)) }
-  let(:band) { Fabricate.build(:band) }
+  let(:band) { Fabricate.create(:band) }
 
   describe '#call' do
     subject { interactor.call }
@@ -77,29 +77,54 @@ RSpec.describe Bands::Crawl, type: :interactor do
   describe '#parse_album' do
     subject { interactor.send(:parse_album, page) }
 
-    let(:page) do
-      Nokogiri::HTML('<div itemtype="http://schema.org/MusicAlbum"><h2 class="trackTitle">Album name</h2></div>')
-    end
-
     before do
-      allow(interactor).to receive(:find_album_id).and_return(1)
       allow(interactor).to receive(:find_album_release_date).and_return('1 Apr 2018')
       allow(interactor).to receive(:add_album)
     end
 
     after { subject }
 
-    it { expect(interactor).to receive(:find_album_id).with(page) }
+    context 'when album title is present' do
+      let(:page) do
+        Nokogiri::HTML('<div itemtype="http://schema.org/MusicAlbum"><h2 class="trackTitle">Album name</h2></div>')
+      end
+
+      it { expect(interactor).to receive(:find_album_id).with(page) }
+
+      context 'when album_id has been found on the page' do
+        before { allow(interactor).to receive(:find_album_id).and_return(1) }
+
+        it 'calls #add_album' do
+          expect(interactor).to receive(:add_album)
+        end
+      end
+
+      context 'when album_id has not been found on the page' do
+        before { allow(interactor).to receive(:find_album_id).and_return(nil) }
+
+        it 'does not call #add_album' do
+          expect(interactor).to_not receive(:add_album)
+        end
+      end
+    end
+
+    context 'when album title is not present' do
+      let(:page) do
+        Nokogiri::HTML('<div>wrong album page</div>')
+      end
+
+      it { expect(interactor).to_not receive(:find_album_id) }
+    end
   end
 
   describe '#find_album_id' do
     subject { interactor.send(:find_album_id, page) }
 
     let(:page) do
-      Nokogiri::HTML('<meta property="og:video" content="https://bandcamp.com/EmbeddedPlayer/v=2/album=2093768027/size=large/tracklist=false/artwork=small/"/>')
+      Nokogiri::HTML('<script>BandFollow.init({"tralbum_id":2286089655,"tralbum_type":"a"});</script>')
     end
 
-    it { should eq "2093768027" }
+    it { should eq "2286089655" }
   end
 
   describe '#find_album_release_date' do
@@ -110,5 +135,46 @@ RSpec.describe Bands::Crawl, type: :interactor do
     end
 
     it { should eq Date.parse('20130101') }
+  end
+
+  describe '#persist_albums' do
+    subject { interactor.send(:persist_albums) }
+
+    let(:registered_albums) do
+      [
+        { uid: 'album1', name: 'Album 1' },
+        { uid: 'album2', name: 'Album 2' },
+      ]
+    end
+
+    before do
+      allow(interactor).to receive(:albums).and_return(registered_albums)
+    end
+
+    context 'when all albums are new' do
+      it { expect { subject }.to change { AlbumRepository.new.count }.by(2) }
+    end
+
+    context 'when one of the albums is already present' do
+      before do
+        AlbumRepository.new.create(
+          uid: 'album1', name: 'Album 1', band_id: band.id
+        )
+      end
+
+      it { expect { subject }.to change { AlbumRepository.new.count }.by(1) }
+    end
+
+    context 'when one of the albums is not present anymore' do
+      let(:registered_albums) { [] }
+
+      before do
+        AlbumRepository.new.create(
+          uid: 'album3', name: 'Album 3', band_id: band.id
+        )
+      end
+
+      it { expect { subject }.to change { AlbumRepository.new.count }.by(-1) }
+    end
   end
 end

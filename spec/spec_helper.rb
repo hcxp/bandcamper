@@ -6,6 +6,7 @@ SimpleCov.start
 
 require_relative '../config/environment'
 require 'webmock/rspec'
+require 'database_cleaner'
 
 Hanami.boot
 Hanami::Utils.require!("#{__dir__}/support")
@@ -50,6 +51,17 @@ RSpec.configure do |config|
     # a real object. This is generally recommended, and will default to
     # `true` in RSpec 4.
     mocks.verify_partial_doubles = true
+  end
+
+  config.before(:suite) do
+    DatabaseCleaner.strategy = :transaction
+    DatabaseCleaner.clean_with(:truncation)
+  end
+
+  config.around(:each) do |example|
+    DatabaseCleaner.cleaning do
+      example.run
+    end
   end
 
 # The settings below are suggested to provide a good initial experience

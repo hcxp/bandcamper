@@ -15,6 +15,7 @@ class BandCrawlWorker
   def self.perform_async(band_id)
     band = BandRepository.new.find(band_id)
     Bands::UpdateState.new(band, :queued).call
+    BandRepository.new.update(band.id, queued_at: Time.now)
 
     super
   end
@@ -29,6 +30,7 @@ class BandCrawlWorker
     begin
       serv = Bands::Crawl.new(band).call
     rescue => e
+      handle_exception(e)
       state = :failed
       result = false
     else
@@ -61,5 +63,10 @@ class BandCrawlWorker
       location: serv.location,
       photo_url: serv.photo_url,
     )
+  end
+
+  def handle_exception(e)
+    Hanami.logger.error "Error: #{e.message}"
+    Hanami.logger.error e.backtrace
   end
 end
