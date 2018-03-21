@@ -9,6 +9,7 @@ gem 'jsonapi-hanami', github: 'jsonapi-rb/jsonapi-hanami'
 gem 'sidekiq'
 gem 'sidekiq-throttled'
 gem 'spidr'
+gem 'sinatra', require: false
 
 gem 'sqlite3'
 
@@ -28,6 +29,7 @@ group :test do
   gem 'webmock'
   gem 'hanami-fabrication'
   gem 'simplecov', require: false
+  gem 'database_cleaner'
 end
 
 group :production do

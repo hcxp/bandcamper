@@ -1,4 +1,15 @@
 class BandRepository < Hanami::Repository
+  associations do
+    has_many :albums
+  end
+
+  def find_with_albums(id)
+    aggregate(:albums)
+      .where(id: id)
+      .as(Band)
+      .one
+  end
+
   def all_by_guids(guids)
     bands
       .where(guid: guids)
@@ -7,6 +18,13 @@ class BandRepository < Hanami::Repository
   def find_by_guid(guid)
     find_by_guids([guid])
       .first
+  end
+
+  def find_by_guid_with_albums(guid)
+    aggregate(:albums)
+      .where(guid: guid)
+      .as(Band)
+      .one
   end
 
   def find_by_guids(guids)

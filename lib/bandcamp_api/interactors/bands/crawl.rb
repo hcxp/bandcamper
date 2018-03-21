@@ -18,6 +18,7 @@ class Bands::Crawl
   def initialize(band, logger: Hanami.logger)
     @band = band
     @logger = logger
+    @album_repo = AlbumRepository.new
   end
 
   def call
@@ -48,11 +49,13 @@ class Bands::Crawl
     logger.info 'Albums:'
     logger.info albums
     logger.info
+
+    persist_albums
   end
 
   private
 
-  attr_reader :logger, :albums, :band
+  attr_reader :logger, :albums, :band, :album_repo
 
   # @todo Move that to separate service
   def parse_page(page)
@@ -69,6 +72,8 @@ class Bands::Crawl
     if res.first
       album_id = find_album_id(page)
       album_release_date = find_album_release_date(page)
+
+      return false if album_id.nil?
 
       add_album(
         uid:  album_id,
@@ -99,12 +104,8 @@ class Bands::Crawl
   end
 
   def find_album_id(page)
-    url = page.search('//meta[@property="og:video"]')
-              .first
-              .attributes['content']
-              .value
-
-    return url.match(%r{/album=(\d+)/})[1]
+    matches = page.to_s.match(/"tralbum_id":(\d+)/)
+    matches ? matches[1] : nil
   end
 
   def find_album_release_date(page)
@@ -125,5 +126,24 @@ class Bands::Crawl
       logger.debug "Registering album #{opts[:name]}"
       @albums << opts
     end
+  end
+
+  def persist_albums
+    uids = albums.map {|a| a[:uid] }
+    logger.debug "Registered album ids: #{uids}"
+
+    existing = BandRepository.new.find_with_albums(band.id).albums
+    existing_uids = existing.map(&:uid)
+    logger.debug "Existing album uids: #{existing_uids}"
+
+    new_uids = uids - existing_uids
+    new_albums = albums.select { |a| new_uids.include? a[:uid] }
+    logger.debug "New album uids: #{new_uids}"
+
+    to_delete_uids = existing_uids - uids
+    logger.debug "Albums to delete: #{to_delete_uids}"
+
+    album_repo.delete_by_uids(to_delete_uids)
+    album_repo.create(new_albums.each { |h| h[:band_id] = band.id })
   end
 end
