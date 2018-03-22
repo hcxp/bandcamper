@@ -6,7 +6,7 @@ require_relative '../apps/api/application'
 require_relative './sidekiq'
 
 Hanami.configure do
-  mount Api::Application, at: '/'
+  mount Api::Application, at: '/api'
 
   model do
     ##
