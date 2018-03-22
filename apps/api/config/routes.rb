@@ -3,4 +3,7 @@
 #
 # Example:
 # get '/hello', to: ->(env) { [200, {}, ['Hello from Hanami!']] }
-get '/bands/:guid', to: 'bands#by_guid'
+
+namespace :v1 do
+  get '/bands/:guid', to: 'v1/bands#by_guid'
+end
